@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Valentino Pais · Full Stack Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+  :root{
+    --bg:#0d1117;
+    --text:#e6edf3;
+    --dim:#8b949e;
+    --faint:#6e7681;
+    --border:#30363d;
+    --surface:#161b22;
+    --blue:#58a6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  a{color:inherit;text-decoration:none}
+  body{background:var(--bg);color:var(--text);font-family:'Outfit',system-ui,sans-serif;min-height:100vh}
+
+  /* STICKY TITLE */
+  .topbar{position:sticky;top:0;z-index:50;width:100%;background:rgba(13,17,23,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s}
+  .topbar:hover{background:rgba(22,27,34,.92)}
+  .topbar-inner{max-width:1040px;margin:0 auto;padding:18px 28px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px;letter-spacing:-.02em}
+  .topbar .nm{font-size:clamp(1rem,3vw,1.7rem);font-weight:800}
+  .topbar .role{font-size:clamp(1rem,3vw,1.7rem);color:var(--dim);font-weight:600}
+
+  main{max-width:1040px;margin:0 auto;padding:24px 28px 90px}
+
+  /* BENTO GRID */
+  .bento{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;grid-auto-flow:dense}
+  .tile{position:relative;border-radius:20px;padding:22px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;color:#fff;transition:transform .2s,filter .2s;aspect-ratio:1}
+  a.tile:hover{transform:translateY(-3px);filter:brightness(1.06)}
+  .col2{grid-column:span 2;aspect-ratio:auto}
+  .tile>*{position:relative;z-index:2}
+  .t-label{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;opacity:.72}
+  .t-h{font-size:clamp(1.25rem,2.3vw,1.6rem);font-weight:700;letter-spacing:-.01em;line-height:1.18}
+  .t-sub{font-size:.96rem;opacity:.85;margin-top:6px;line-height:1.5}
+  .t-dates{font-family:'JetBrains Mono',monospace;font-size:.76rem;opacity:.7}
+  .ext{position:absolute;top:16px;right:16px;opacity:.6;z-index:3}
+  .ext svg{width:18px;height:18px}
+  .demo{display:inline-flex;align-items:center;gap:5px;font-weight:600;font-size:.92rem;margin-top:12px}
+  .demo.soon{opacity:.55}
+  .link-hl{color:#fff;text-decoration:underline;text-underline-offset:2px;font-weight:600}
+
+  /* hello world */
+  .hello-world{font-size:clamp(1.4rem,3vw,1.85rem);font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+  .hello-world .star{color:#f5c518;margin-left:8px}
+  .hello-world .jump{display:inline-block}
+  .hello-world.go .jump{animation:jump .55s ease-in-out both}
+  @keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
+
+  /* github matrix */
+  .matrix{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+  .c-gh .matrix{z-index:0}
+
+  /* colors */
+  .c-hello{background:linear-gradient(135deg,#434190,#5a52c9)}
+  .c-hello .hello-world{font-size:clamp(1.4rem,3vw,1.85rem)}
+  .c-hello .t-sub{font-size:.9rem;line-height:1.45}
+  .c-stack{background:linear-gradient(160deg,#8957e5,#a371f7);justify-content:center;align-items:center;text-align:center;gap:14px}
+  .c-stack .t-h{width:100%}
+  .c-eng{background:linear-gradient(150deg,#1f9b87,#2bb79f);align-items:center;justify-content:center;text-align:center;gap:14px}
+  .c-simax{background:linear-gradient(150deg,#1a7f37,#2ea043)}
+  .c-siacc{background:linear-gradient(150deg,#1f6feb,#388bfd)}
+  .c-display{background:linear-gradient(150deg,#0e7490,#1eb8d0)}
+  .c-kanu{background:linear-gradient(150deg,#2da44e,#56d364)}
+  .c-gh{background:#080b11;border:1px solid var(--border)}
+  .c-mail{background:linear-gradient(150deg,#c5221f,#ea4335)}
+  .c-li{background:linear-gradient(150deg,#004182,#0a66c2)}
+  .c-cv{background:linear-gradient(150deg,#bc4c00,#f0883e)}
+  .c-loc{background:#0d1117}
+
+  .stack-pills{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:6px;width:100%}
+  .stack-pills span{font-family:'JetBrains Mono',monospace;font-size:.7rem;background:rgba(255,255,255,.17);border-radius:7px;padding:4px 8px}
+  .eng-label{font-family:'JetBrains Mono',monospace;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;opacity:.9;font-weight:400}
+  .eng-circle{display:flex;align-items:center;justify-content:center;aspect-ratio:1;width:64%;max-width:150px;border:3px solid rgba(255,255,255,.65);border-radius:50%;font-weight:800;font-size:clamp(.95rem,3.2vw,1.25rem);letter-spacing:-.01em}
+
+  /* brand tiles */
+  .brandtile{align-items:center;justify-content:center;text-align:center;gap:14px}
+  .brand-ico{display:flex}
+  .brand-ico svg{width:52px;height:52px}
+  .brand-name{font-weight:700;font-size:1.1rem;letter-spacing:-.01em}
+
+  /* map tile */
+  .maptile{padding:0;overflow:hidden}
+  .maptile .mapframe{position:absolute;inset:0;width:100%;height:100%;z-index:1;background:#0d1117}
+  .leaflet-container{background:#0d1117!important}
+  .maptile .map-label{position:absolute;top:14px;left:16px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;opacity:.85}
+  .maptile .map-overlay{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;pointer-events:none}
+  .avatar{width:86px;height:86px;border-radius:50%;border:4px solid rgba(255,255,255,.9);background:#3a4150 center/cover no-repeat;box-shadow:0 6px 20px rgba(0,0,0,.55)}
+  .pin{display:inline-flex;align-items:center;gap:6px;background:rgba(13,17,23,.82);border:1px solid var(--border);color:#fff;font-size:.8rem;font-weight:600;padding:5px 11px;border-radius:999px}
+  .pin .pdot{width:7px;height:7px;border-radius:50%;background:#ff5a5f;box-shadow:0 0 8px #ff5a5f}
+
+  /* language toggle */
+  .langpick{position:fixed;bottom:16px;right:16px;z-index:80;display:flex;border:1px solid var(--border);border-radius:999px;overflow:hidden;background:var(--surface);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .langpick button{background:transparent;color:var(--faint);border:none;cursor:pointer;padding:7px 13px;font-family:inherit;font-weight:700;font-size:.78rem;transition:all .2s}
+  .langpick button.active{background:var(--blue);color:#04101f}
+
+  @media(max-width:860px){
+    .bento{grid-template-columns:repeat(2,1fr)}
+    .col2{grid-column:span 2}
+  }
+  @media(max-width:520px){.bento{gap:11px}}
+</style>
+</head>
+<body>
+  <header class="topbar" id="topbar" title="Volver arriba / Back to top">
+    <div class="topbar-inner"><span class="nm">Valentino Pais</span><span class="role" data-es="Desarrollador Full Stack" data-en="Full Stack Developer">Desarrollador Full Stack</span></div>
+  </header>
+
+  <main id="top">
+    <div class="bento">
+
+      <!-- HELLO WORLD -->
+      <div class="tile c-hello col2">
+        <div>
+          <div class="hello-world" id="hwBox"><span id="helloWorld" data-es="HOLA MUNDO" data-en="HELLO WORLD">HOLA MUNDO</span><span class="star">★</span></div>
+          <div class="t-sub" data-es="Mi nombre es Valentino, programador full stack de Buenos Aires, Argentina. Mi experiencia va desde integrar una extensión con un token de firma digital, hasta desarrollar un software de mesa de ayuda, sistemas de monitoreo de fibra óptica y apps Android con licencias de contenido." data-en="My name is Valentino, a full stack developer from Buenos Aires, Argentina. My experience ranges from integrating a browser extension with a digital signature token, to building a help desk software, fiber-optic monitoring systems and Android apps with content licensing.">Mi nombre es Valentino, programador full stack de Buenos Aires, Argentina. Mi experiencia va desde integrar una extensión con un token de firma digital, hasta desarrollar un software de mesa de ayuda, sistemas de monitoreo de fibra óptica y apps Android con licencias de contenido.</div>
+          <div class="t-sub" style="margin-top:12px"><span data-es="Actualmente trabajando con la hermosa gente de " data-en="Currently working with the lovely people at ">Actualmente trabajando con la hermosa gente de </span><a class="link-hl" href="https://www.smartg.com.ar/" target="_blank">SmartG</a><span>.</span></div>
+        </div>
+      </div>
+
+      <!-- TECNOLOGÍAS -->
+      <div class="tile c-stack">
+        <div class="t-h" data-es="Tecnologías" data-en="Technologies">Tecnologías</div>
+        <div class="stack-pills">
+          <span>JavaScript</span><span>C#</span><span>HTML</span><span>CSS</span><span>.NET MVC</span><span>jQuery</span><span>REST APIs</span><span>SQL Server</span><span>MySQL</span><span>Unity</span><span>Android</span>
+        </div>
+      </div>
+
+      <!-- INGLÉS -->
+      <div class="tile c-eng">
+        <div class="eng-label" data-es="nivel de inglés" data-en="english level">nivel de inglés</div>
+        <div class="eng-circle" data-es="AVANZADO" data-en="ADVANCED">AVANZADO</div>
+      </div>
+
+      <!-- SIMAX -->
+      <a class="tile c-simax col2" href="demos/simax/index.html">
+        <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+        <div class="t-dates">2022 — 2026</div>
+        <div>
+          <div class="t-h">Simax</div>
+          <div class="t-sub" data-es="Plataforma de mesa de ayuda para empresas con arquitectura MVC en .NET y conexión a bases de datos. Incluye SimaxCliente, módulo de gestión y administración de clientes, y herramientas administrativas con foco en UI/UX." data-en="Enterprise help desk platform built on .NET MVC with database connectivity. Includes SimaxCliente, a module for client management and administration, plus admin tools focused on UI/UX.">Plataforma de mesa de ayuda para empresas con arquitectura MVC en .NET y conexión a bases de datos. Incluye SimaxCliente, módulo de gestión y administración de clientes, y herramientas administrativas con foco en UI/UX.</div>
+          <div class="demo" data-es="Ver demo →" data-en="View demo →">Ver demo →</div>
+        </div>
+      </a>
+
+      <!-- SIACC -->
+      <div class="tile c-siacc col2">
+        <div class="t-dates">2022 — 2026</div>
+        <div>
+          <div class="t-h">SIACC</div>
+          <div class="t-sub" data-es="Sistema de firma digital para la Obra Social del Ejército Argentino: firma digital con API REST, extensión de Chrome propia e integración con dispositivos de hardware ePass." data-en="Digital signature system for the Argentine Army's health insurance: digital signing with a REST API, a custom Chrome extension and integration with ePass hardware devices.">Sistema de firma digital para la Obra Social del Ejército Argentino: firma digital con API REST, extensión de Chrome propia e integración con dispositivos de hardware ePass.</div>
+          <div class="demo soon" data-es="Demo próximamente" data-en="Demo coming soon">Demo próximamente</div>
+        </div>
+      </div>
+
+      <!-- DISPLAY -->
+      <div class="tile c-display">
+        <div class="t-label" data-es="experiencia · 2023—Hoy" data-en="experience · 2023—Now">experiencia · 2023—Hoy</div>
+        <div>
+          <div class="t-h" data-es="Display de Monitoreo" data-en="Monitoring Display">Display de Monitoreo</div>
+          <div class="t-dates" data-es="Fibra óptica" data-en="Fiber optics">Fibra óptica</div>
+          <div class="demo soon" data-es="Demo próximamente" data-en="Demo coming soon">Demo próximamente</div>
+        </div>
+      </div>
+
+      <!-- KANUSUR -->
+      <div class="tile c-kanu">
+        <div class="t-label" data-es="experiencia · 2021" data-en="experience · 2021">experiencia · 2021</div>
+        <div>
+          <div class="t-h">KanuSur</div>
+          <div class="t-dates" data-es="Licencias + Android" data-en="Licensing + Android">Licencias + Android</div>
+          <div class="demo soon" data-es="Demo próximamente" data-en="Demo coming soon">Demo próximamente</div>
+        </div>
+      </div>
+
+      <!-- GITHUB -->
+      <a class="tile c-gh" href="https://github.com/valentinopais" target="_blank">
+        <canvas class="matrix" id="ghMatrix"></canvas>
+        <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+        <div class="t-label" data-es="código" data-en="code">código</div>
+        <div>
+          <div class="t-h">GitHub</div>
+          <div class="t-sub" data-es="Mi trabajo y proyectos." data-en="My work & projects.">Mi trabajo y proyectos.</div>
+        </div>
+      </a>
+
+      <!-- EMAIL -->
+      <a class="tile c-mail brandtile" href="mailto:valenpais@gmail.com">
+        <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+        <span class="brand-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg></span>
+        <span class="brand-name">email</span>
+      </a>
+
+      <!-- LINKEDIN -->
+      <a class="tile c-li brandtile" href="#" target="_blank">
+        <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+        <span class="brand-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span>
+        <span class="brand-name">linkedin</span>
+      </a>
+
+      <!-- CURRÍCULUM -->
+      <a class="tile c-cv brandtile" href="VALENTINO PAIS CV 2026.pdf" target="_blank">
+        <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v12M7 12l5 5 5-5"/></svg></span>
+        <span class="brand-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></span>
+        <span class="brand-name" data-es="currículum" data-en="résumé">currículum</span>
+      </a>
+
+      <!-- UBICACIÓN -->
+      <div class="tile c-loc col2 maptile">
+        <div class="mapframe" id="locmap"></div>
+        <div class="map-label" data-es="ubicación" data-en="location">ubicación</div>
+        <div class="map-overlay">
+          <div class="avatar" style="background-image:url('perfil.jpg')"></div>
+          <div class="pin"><span class="pdot"></span> Obelisco · Buenos Aires</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- LANGUAGE TOGGLE -->
+  <div class="langpick">
+    <button data-lang="es">ES</button>
+    <button data-lang="en">EN</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script>
+    // Scroll to top
+    document.getElementById('topbar').addEventListener('click', ()=>{
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    // ---- Language ----
+    const hwBox = document.getElementById('hwBox');
+    let LANG = 'es';
+    function splitHello(){
+      const hw = document.getElementById('helloWorld');
+      const t = hw.getAttribute('data-'+LANG) || hw.textContent;
+      hw.textContent = '';
+      [...t].forEach((ch,i)=>{
+        const s = document.createElement('span');
+        s.textContent = ch === ' ' ? ' ' : ch;
+        s.className = 'jump';
+        s.style.animationDelay = (i*0.07) + 's';
+        hw.appendChild(s);
+      });
+    }
+    function setLang(lang){
+      LANG = lang;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-es]').forEach(el=>{
+        if(el.id === 'helloWorld') return; // handled by splitHello
+        const t = el.getAttribute('data-'+lang);
+        if(t !== null) el.textContent = t;
+      });
+      splitHello();
+      document.querySelectorAll('.langpick button').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+      try{ localStorage.setItem('lang', lang); }catch(e){}
+    }
+    document.querySelectorAll('.langpick button').forEach(b=>{
+      b.addEventListener('click', ()=>setLang(b.dataset.lang));
+    });
+    // detect: english-speaking locale -> EN, else ES
+    function detectLang(){
+      try{ const s = localStorage.getItem('lang'); if(s) return s; }catch(e){}
+      const langs = navigator.languages || [navigator.language || 'es'];
+      return langs.some(l => (l||'').toLowerCase().startsWith('en')) ? 'en' : 'es';
+    }
+    setLang(detectLang());
+    setTimeout(()=>{ hwBox.classList.add('go'); splitHello(); }, 1000);
+
+    // ---- GitHub matrix ----
+    (function(){
+      const canvas = document.getElementById('ghMatrix');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const chars = '01<>{}/$#abcdef0101'.split('');
+      const fs = 12; let drops = [];
+      function resize(){
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+        const cols = Math.max(1, Math.floor(canvas.width / fs));
+        drops = Array(cols).fill(0).map(()=> Math.random()*canvas.height/fs);
+      }
+      function draw(){
+        ctx.fillStyle='rgba(8,11,17,0.14)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle='#2ea043'; ctx.font=fs+'px monospace';
+        for(let i=0;i<drops.length;i++){
+          ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*fs, drops[i]*fs);
+          if(drops[i]*fs > canvas.height && Math.random()>0.975) drops[i]=0;
+          drops[i]++;
+        }
+      }
+      resize(); setInterval(draw,75); window.addEventListener('resize', resize);
+    })();
+
+    // ---- Dark map (no controls, no interaction) centered on Obelisco ----
+    (function(){
+      if(typeof L === 'undefined') return;
+      const map = L.map('locmap', {
+        center: [-34.60368, -58.38157], zoom: 15,
+        zoomControl:false, attributionControl:false,
+        dragging:false, scrollWheelZoom:false, doubleClickZoom:false,
+        boxZoom:false, keyboard:false, touchZoom:false, tap:false, inertia:false
+      });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom:19}).addTo(map);
+      setTimeout(()=>map.invalidateSize(), 250);
+    })();
+  </script>
+</body>
+</html>
