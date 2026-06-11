@@ -33,7 +33,7 @@
 
   /* BENTO GRID */
   .bento{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;grid-auto-flow:dense}
-  .tile{position:relative;border-radius:20px;padding:22px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;color:#fff;transition:transform .2s,filter .2s;aspect-ratio:1}
+  .tile{position:relative;border-radius:20px;padding:22px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;color:#fff;transition:transform .3s,filter .2s,opacity .3s;aspect-ratio:1}
   a.tile:hover{transform:translateY(-3px);filter:brightness(1.06)}
   .col2{grid-column:span 2;aspect-ratio:auto}
   .tile>*{position:relative;z-index:2}
@@ -101,6 +101,23 @@
   .langpick button{background:transparent;color:var(--faint);border:none;cursor:pointer;padding:7px 13px;font-family:inherit;font-weight:700;font-size:.78rem;transition:all .2s}
   .langpick button.active{background:var(--blue);color:#04101f}
 
+  /* category color-coding + filter */
+  .tile[data-cat]::after{content:"";position:absolute;bottom:14px;right:16px;width:9px;height:9px;border-radius:50%;z-index:5;transition:box-shadow .3s,transform .3s}
+  .tile[data-cat="exp"]::after{background:#f0883e}
+  .tile[data-cat="info"]::after{background:#58a6ff}
+  body.f-exp .tile[data-cat="exp"], body.f-info .tile[data-cat="info"]{transform:translateY(-10px)}
+  body.f-exp .tile[data-cat="info"], body.f-info .tile[data-cat="exp"]{opacity:.25;transform:scale(.985)}
+  body.f-exp .tile[data-cat="exp"]::after{box-shadow:0 0 0 5px rgba(240,136,62,.22);transform:scale(1.2)}
+  body.f-info .tile[data-cat="info"]::after{box-shadow:0 0 0 5px rgba(88,166,255,.22);transform:scale(1.2)}
+
+  .filterbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .fpill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:inherit;font-weight:600;font-size:.86rem;padding:8px 16px;border-radius:999px;cursor:pointer;transition:all .2s}
+  .fpill::before{content:"";width:9px;height:9px;border-radius:50%;flex:none}
+  .fpill[data-cat="exp"]::before{background:#f0883e}
+  .fpill[data-cat="info"]::before{background:#58a6ff}
+  .fpill[data-cat="exp"].active{border-color:#f0883e;color:#fff;background:rgba(240,136,62,.16)}
+  .fpill[data-cat="info"].active{border-color:#58a6ff;color:#fff;background:rgba(88,166,255,.16)}
+
   @media(max-width:860px){
     .bento{grid-template-columns:repeat(2,1fr)}
     .col2{grid-column:span 2}
@@ -114,10 +131,14 @@
   </header>
 
   <main id="top">
+    <div class="filterbar">
+      <button class="fpill" data-cat="exp" data-es="Experiencia" data-en="Experience">Experiencia</button>
+      <button class="fpill" data-cat="info" data-es="Información" data-en="Information">Información</button>
+    </div>
     <div class="bento">
 
       <!-- HELLO WORLD -->
-      <div class="tile c-hello col2">
+      <div class="tile c-hello col2" data-cat="info">
         <div>
           <div class="hello-world" id="hwBox"><span id="helloWorld" data-es="HOLA MUNDO" data-en="HELLO WORLD">HOLA MUNDO</span><span class="star">★</span></div>
           <div class="t-sub" data-es="Mi nombre es Valentino, programador full stack de Buenos Aires, Argentina. Mi experiencia va desde integrar una extensión con un token de firma digital, hasta desarrollar un software de mesa de ayuda, sistemas de monitoreo de fibra óptica y apps Android con licencias de contenido." data-en="My name is Valentino, a full stack developer from Buenos Aires, Argentina. My experience ranges from integrating a browser extension with a digital signature token, to building a help desk software, fiber-optic monitoring systems and Android apps with content licensing.">Mi nombre es Valentino, programador full stack de Buenos Aires, Argentina. Mi experiencia va desde integrar una extensión con un token de firma digital, hasta desarrollar un software de mesa de ayuda, sistemas de monitoreo de fibra óptica y apps Android con licencias de contenido.</div>
@@ -126,7 +147,7 @@
       </div>
 
       <!-- TECNOLOGÍAS -->
-      <div class="tile c-stack">
+      <div class="tile c-stack" data-cat="info">
         <div class="t-h" data-es="Tecnologías" data-en="Technologies">Tecnologías</div>
         <div class="stack-pills">
           <span>JavaScript</span><span>C#</span><span>HTML</span><span>CSS</span><span>.NET MVC</span><span>jQuery</span><span>REST APIs</span><span>SQL Server</span><span>MySQL</span><span>Unity</span><span>Android</span>
@@ -134,13 +155,13 @@
       </div>
 
       <!-- INGLÉS -->
-      <div class="tile c-eng">
+      <div class="tile c-eng" data-cat="info">
         <div class="eng-label" data-es="nivel de inglés" data-en="english level">nivel de inglés</div>
         <div class="eng-circle" data-es="AVANZADO" data-en="ADVANCED">AVANZADO</div>
       </div>
 
       <!-- SIMAX -->
-      <a class="tile c-simax col2" href="demos/simax/index.html">
+      <a class="tile c-simax col2" data-cat="exp" href="demos/simax/index.html">
         <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
         <div class="t-dates">2022 — 2026</div>
         <div>
@@ -151,7 +172,7 @@
       </a>
 
       <!-- SIACC -->
-      <div class="tile c-siacc col2">
+      <div class="tile c-siacc col2" data-cat="exp">
         <div class="t-dates">2022 — 2026</div>
         <div>
           <div class="t-h">SIACC</div>
@@ -161,7 +182,7 @@
       </div>
 
       <!-- DISPLAY -->
-      <div class="tile c-display">
+      <div class="tile c-display" data-cat="exp">
         <div class="t-label" data-es="experiencia · 2023—Hoy" data-en="experience · 2023—Now">experiencia · 2023—Hoy</div>
         <div>
           <div class="t-h" data-es="Display de Monitoreo" data-en="Monitoring Display">Display de Monitoreo</div>
@@ -171,7 +192,7 @@
       </div>
 
       <!-- KANUSUR -->
-      <div class="tile c-kanu">
+      <div class="tile c-kanu" data-cat="exp">
         <div class="t-label" data-es="experiencia · 2021" data-en="experience · 2021">experiencia · 2021</div>
         <div>
           <div class="t-h">KanuSur</div>
@@ -181,7 +202,7 @@
       </div>
 
       <!-- GITHUB -->
-      <a class="tile c-gh" href="https://github.com/valentinopais" target="_blank">
+      <a class="tile c-gh" data-cat="info" href="https://github.com/valentinopais" target="_blank">
         <canvas class="matrix" id="ghMatrix"></canvas>
         <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
         <div class="t-label" data-es="código" data-en="code">código</div>
@@ -192,28 +213,28 @@
       </a>
 
       <!-- EMAIL -->
-      <a class="tile c-mail brandtile" href="mailto:valenpais@gmail.com">
+      <a class="tile c-mail brandtile" data-cat="info" href="mailto:valenpais@gmail.com">
         <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
         <span class="brand-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg></span>
         <span class="brand-name">email</span>
       </a>
 
       <!-- LINKEDIN -->
-      <a class="tile c-li brandtile" href="#" target="_blank">
+      <a class="tile c-li brandtile" data-cat="info" href="#" target="_blank">
         <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
         <span class="brand-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span>
         <span class="brand-name">linkedin</span>
       </a>
 
       <!-- CURRÍCULUM -->
-      <a class="tile c-cv brandtile" href="VALENTINO PAIS CV 2026.pdf" target="_blank">
+      <a class="tile c-cv brandtile" data-cat="info" href="VALENTINO PAIS CV 2026.pdf" target="_blank">
         <span class="ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v12M7 12l5 5 5-5"/></svg></span>
         <span class="brand-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></span>
         <span class="brand-name" data-es="currículum" data-en="résumé">currículum</span>
       </a>
 
       <!-- UBICACIÓN -->
-      <div class="tile c-loc col2 maptile">
+      <div class="tile c-loc col2 maptile" data-cat="info">
         <div class="mapframe" id="locmap"></div>
         <div class="map-label" data-es="ubicación" data-en="location">ubicación</div>
         <div class="map-overlay">
@@ -276,6 +297,19 @@
     }
     setLang(detectLang());
     setTimeout(()=>{ hwBox.classList.add('go'); splitHello(); }, 1000);
+
+    // ---- Category filter (Experiencia / Información) ----
+    const fpills = document.querySelectorAll('.fpill');
+    let activeCat = null;
+    fpills.forEach(p=>{
+      p.addEventListener('click', ()=>{
+        const cat = p.dataset.cat;
+        activeCat = (activeCat === cat) ? null : cat;
+        document.body.classList.toggle('f-exp', activeCat === 'exp');
+        document.body.classList.toggle('f-info', activeCat === 'info');
+        fpills.forEach(x=> x.classList.toggle('active', x.dataset.cat === activeCat));
+      });
+    });
 
     // ---- GitHub matrix ----
     (function(){
